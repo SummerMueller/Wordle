@@ -3,10 +3,13 @@ INCLUDE Irvine32.inc
 .data
 welcome byte "WORDLE in asm", 0
 promptMessage byte "Enter guess: ", 0
-gameoverMessage byte "You ran out of guesses :(", 0
+gameoverMessage byte "You ran out of guesses. The word was: ", 0
 winMessage byte "You guessed the word!!", 0
 restartMessage byte "Type wordle to play again. . .",0
-target byte "STONE"
+wordlist byte "STONE", "CRANE", "LIGHT", "ORGAN", "QUIET", "BLOCK", "PANIC", "LLAMA", "WHITE", "TIMER"
+numWords byte 10
+wordindex byte 0
+target byte 6 dup(0)
 restartkey byte 6 DUP(0)
 nextRow BYTE 2
 newline byte 13, 10, 0
@@ -20,6 +23,7 @@ gameloop:
 mov nextRow, 2
 mov bl, 0
 call Clrscr
+call loadword
 
 ; Prints welcome message
 mov edx, offset welcome
@@ -48,6 +52,8 @@ mov edx, offset newline
 call writestring
 mov edx, OFFSET gameoverMessage
 call WriteString
+mov edx, offset target
+call writestring
 inc nextRow
 inc nextRow
 jmp waitrestart
@@ -115,6 +121,42 @@ jmp gameloop
 endprogram :
 exit
 main ENDP
+
+
+loadword proc
+pushad
+mov al, wordIndex
+mov bl, 5
+mov esi, offset wordlist
+mov edi, offset target
+
+movzx eax, al
+mov ecx, 5
+mulloop:
+mov edx, eax
+shl edx, 0
+mov eax, eax
+lea eax, [eax + eax*4]
+
+add esi, eax
+mov ecx, 5
+copyloop:
+mov al, [esi]
+mov [edi], al
+inc esi
+inc edi
+loop copyloop
+
+mov al, wordindex
+inc al
+cmp al, numwords
+jb nowrap
+mov al, 0
+nowrap:
+mov wordindex, al
+popad
+ret
+loadword endp
 
 
 toupper proc
