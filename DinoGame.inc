@@ -50,3 +50,11 @@ WriteTerrain PROTO,
      screenLength:BYTE
 
 IncrementTerrain PROTO
+
+; Dino.asm
+
+LoadDino PROTO
+
+DrawDino PROTO,
+    topRow:BYTE,
+    leftCol:BYTE
