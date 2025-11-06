@@ -5,7 +5,9 @@ welcome byte "WORDLE in asm", 0
 promptMessage byte "Enter guess: ", 0
 gameoverMessage byte "You ran out of guesses :(", 0
 winMessage byte "You guessed the word!!", 0
+restartMessage byte "Type wordle to play again. . .",0
 target byte "STONE"
+restartkey byte 6 DUP(0)
 nextRow BYTE 2
 newline byte 13, 10, 0
 guess BYTE 6 DUP(0)
@@ -13,6 +15,9 @@ colors BYTE 5 DUP(0)
 
 .code
 main PROC
+
+gameloop:
+mov nextRow, 2
 mov bl, 0
 call Clrscr
 
@@ -43,9 +48,9 @@ mov edx, offset newline
 call writestring
 mov edx, OFFSET gameoverMessage
 call WriteString
-mov edx, offset newline
-call writestring
-jmp endprogram
+inc nextRow
+inc nextRow
+jmp waitrestart
 
 ; Reads the input from the bottom of the screen
 getinput :
@@ -83,14 +88,29 @@ mov ecx, 5
 repe cmpsb
 jnz nowin
 ; Prints the win message if the word was found
-mov edx, offset newline
-call writestring
-mov edx, offset newline
-call writestring
+inc nextRow
+inc nextRow
+mov dl, 0
+mov dh, nextRow
+call gotoxy
 mov edx, offset winMessage
 call writestring
 mov edx, offset newline
 call writestring
+inc nextRow
+
+waitrestart:
+inc nextRow
+inc nextRow
+mov dl, 0
+mov dh, nextRow
+call gotoxy
+mov edx, offset restartMessage
+call writestring
+mov edx, OFFSET restartkey
+mov ecx, SIZEOF restartkey
+call readstring
+jmp gameloop
 
 endprogram :
 exit
