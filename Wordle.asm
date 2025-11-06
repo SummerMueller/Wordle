@@ -6,19 +6,18 @@ promptMessage byte "Enter guess: ", 0
 gameoverMessage byte "You ran out of guesses :(", 0
 winMessage byte "You guessed the word!!", 0
 target byte "STONE"
+nextRow BYTE 2
 newline byte 13, 10, 0
 guess BYTE 6 DUP(0)
 colors BYTE 5 DUP(0)
 
 .code
 main PROC
-mov ebx, 6
+mov bl, 0
 call Clrscr
 
 ; Prints welcome message
 mov edx, offset welcome
-call writestring
-mov edx, offset newline
 call writestring
 mov edx, offset newline
 call writestring
@@ -32,23 +31,26 @@ afteroutput :
 jmp checkforwin
 nowin :
 ; Decrements the remaining guess counter
-dec ebx
-xor eax, eax
-cmp ebx, eax
-jnz getinput
+inc bl
+cmp bl, 6
+jne getinput
 
 ; Prints the game over message if the user uses all size guesses
 mov dl, 0
-mov dh, 0
+mov dh, nextRow
 call gotoxy
+mov edx, offset newline
+call writestring
 mov edx, OFFSET gameoverMessage
 call WriteString
+mov edx, offset newline
+call writestring
 jmp endprogram
 
 ; Reads the input from the bottom of the screen
 getinput :
 mov dl, 0
-mov dh, 29
+mov dh, nextRow
 call gotoxy
 mov edx, offset promptMessage
 call writestring
@@ -57,6 +59,7 @@ mov ecx, SIZEOF guess
 call ReadString
 mov esi, offset guess
 call toupper
+inc nextRow
 jmp afterinput
 
 ; Prints the output
@@ -65,12 +68,11 @@ mov esi, offset guess
 mov edi, offset target
 call compareguess
 mov dl, 0
-mov dh, 0
+mov dh, nextRow
 call gotoxy
 ; call debugcolors
 call printcolors
-mov edx, OFFSET newline
-call WriteString
+inc nextRow
 jmp afteroutput
 
 ; Checks if the target word was guessed
@@ -86,6 +88,8 @@ call writestring
 mov edx, offset newline
 call writestring
 mov edx, offset winMessage
+call writestring
+mov edx, offset newline
 call writestring
 
 endprogram :
@@ -192,6 +196,8 @@ setcolor:
 call settextcolor
 mov al, [esi]
 call writechar
+mov al, ' '
+call WriteChar
 
 inc esi
 inc ebx
@@ -206,15 +212,15 @@ printcolors endp
 
 
 DebugColors PROC
-pushad; preserve all registers
-mov esi, OFFSET colors; start of colors array
-mov ecx, 5; number of letters
+pushad
+mov esi, OFFSET colors
+mov ecx, 5
 
 print_colors_debug :
-movzx eax, byte ptr[esi]; load 0, 1, 2 into EAX
-call WriteDec; print as decimal
+movzx eax, byte ptr[esi]
+call WriteDec
 
-mov al, ' '; print a space between values
+mov al, ' '
 call WriteChar
 
 inc esi
