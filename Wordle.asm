@@ -6,7 +6,7 @@ promptMessage byte "Enter guess: ", 0
 gameoverMessage byte "You ran out of guesses. The word was: ", 0
 winMessage byte "You guessed the word!!", 0
 restartMessage byte "Type wordle to play again. . .",0
-wordlist byte "STONE", "CRANE", "LIGHT", "ORGAN", "QUIET", "BLOCK", "PANIC", "LLAMA", "WHITE", "TIMER"
+wordlist byte "CRANE", "LIGHT", "ORGAN", "QUIET", "BLOCK", "PANIC", "LLAMA", "WHITE", "TIMER", "STONE"
 numWords byte 10
 wordindex byte 0
 target byte 6 dup(0)
